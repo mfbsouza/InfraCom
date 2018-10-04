@@ -1,9 +1,12 @@
+# Servidor simples usando TCP/IP que só retorna pra o cliente o dados recebidos.
+
 # pra nao precisar ficar referenciando a biblioteca direto (ex. socket.AF_INET)
 # eu vou simplesmente importar tudo pra dentro do programa.
 from socket import *
 
-HOST = ''
-PORT = 50007
+# definindo algumas constantes do servidor
+HOST = ''       # host vazio eh basicamente traduzido pra o IP da maquina do server
+PORT = 50007    # na função bind().
 SIZE = 1024
 
 # criação do scoket (a.k.a configurando o servidor):
@@ -19,12 +22,17 @@ server_socket.bind((HOST, PORT))
 server_socket.listen(1)
 
 while True:
-    # basicamente o server fica em loop infinito acientando pedidos de conexao
-    # ao aceitar pedidos usando o metodo "accept", nos eh retornado um novo scoket
+    # basicamente o server fica em loop infinito aceitando pedidos de conexao.
+    # Ao aceitar pedidos usando o metodo "accept", nos eh retornado um novo socket
     # que será usando como o "tubo de bytes" e o endereço do cliente.
     conn, addr = server_socket.accept()
-    print('Conectado com: ', addr)
-
-    dados = conn.recv(SIZE)
-    # devolve a informação
-    conn.send(b'Echo > ' + dados)
+    print('Conectado com:', addr)
+    # enquanto existir uma comunicação entre cliente-servidor:
+    while conn:
+        dados = conn.recv(SIZE)
+        # se o client parar de enviar dados vamos fechar a comunicação
+        if not dados: break
+        # devolve os dados recebidos do cliente
+        conn.send(b'Eu sou servidor. Voce disse: ' + dados)
+    # fecha a conexao
+    conn.close()
