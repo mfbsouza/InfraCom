@@ -1,9 +1,7 @@
 # Simples servidor Echo usando TCP/IP
  Basicamente o servidor fica num loop infinito esperando cliente querendo se conectar.
- Quando um cliente pede conexao o servidor cria um novo socket que vai ser usado como um "tubo de dados"
-
-## Executando
-
+ Quando um cliente pede conexao o servidor cria um novo socket que vai ser usado como um "tubo de dados".
+ Para testar, executar primeiro o servidor depois o cliente:
 ```bash
 python3 server.py
 python3 client.py
