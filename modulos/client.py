@@ -1,12 +1,12 @@
 import socket
+from MySocket import MySocket
 
 DNS_HOST = ''
 DNS_PORT = 49152
 
 # send server's domain to DNS and get its IP
-with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
-    s.connect((DNS_HOST, DNS_PORT))
-    s.sendall(b'1bois.com') # 1 -> code for DNS  |  bois.com -> domain
+with MySocket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+    s.dnsQuery("bois.com", DNS_HOST, DNS_PORT)
     data = s.recv(1024)
 
     if data.decode() == '-1':
