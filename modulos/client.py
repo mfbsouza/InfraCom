@@ -14,10 +14,10 @@ with MySocket(socket.AF_INET, socket.SOCK_DGRAM) as s:
     data = s.recv(1024)
 
     if data.decode() == '-1':
-        print('domain not found')
+        print('Error: Domain not found')
     else:
         server_HOST = data
-        print('Received', data.decode())
+        # print('Received', data.decode())
 
 
 # connect to server
@@ -27,14 +27,18 @@ socket_client.connect((server_HOST, server_PORT))
 d_files = socket_client.recv(SIZE*30)    # ajeitar tamanho!!
 d_files = pickle.loads(d_files) # transform data in list
 
+print('Available files:')
+
 # print file_names
 for i, file_name in enumerate(d_files):
     print(i, '-', file_name)
 
-msg = input('Digite o número do arquivo desejado: ')
+msg = input('\nWhich one do you want? ')
 socket_client.send(msg.encode())
 
-resposta = socket_client.recv(SIZE)
-print(resposta.decode())
+print('\nwaiting for file...')
+d_file = socket_client.recv(SIZE)
+print('received file:\n')
+print(d_file.decode())
 
 socket_client.close()

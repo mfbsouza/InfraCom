@@ -24,7 +24,7 @@ server_socket.bind((self_HOST, self_PORT))
 server_socket.listen(1)
 while True:
     conn, addr = server_socket.accept()
-    print('Conectado com:', addr)
+    print('\nConnected to:', addr)
 
     files = listdir('../arquivos')  # list all files at the folder 'arquivos'
     d_files = pickle.dumps(files)   # serialize files
@@ -33,10 +33,15 @@ while True:
     while conn:
         dados = conn.recv(SIZE)     # receive data from client
         if not dados: break
-        conn.send(b'Eu sou servidor. Voce disse: ' + dados)
 
         choosen_file = int(dados.decode())  # transform client's data in int
+        print('choosen file:', files[choosen_file])
 
-        print('arquivo escolhido:', files[choosen_file])
+        file = open('../arquivos/' + files[choosen_file], "r")
+
+        print('sending file...')
+        d_file = file.read().encode()
+        conn.send(d_file) # send choosen file to client
+        print('file sent.')
 
     conn.close()
