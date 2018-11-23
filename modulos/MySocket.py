@@ -13,3 +13,11 @@ class MySocket(socket.socket):
     def dnsRegisterDomain(self, domainString, dnsIP, dnsPort):
         message = "0" + domainString
         self.sendto(message.encode(), (dnsIP, dnsPort))
+
+    def sendArquive(self, arquive):
+        print()
+    def reciveArquive(self):
+        print()
+
+    def recieveDataOfAnySize(self):
+        print()
