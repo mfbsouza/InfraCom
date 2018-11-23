@@ -5,6 +5,7 @@ import pickle
 DNS_HOST = ''
 DNS_PORT = 49152
 
+server_HOST = ''
 server_PORT = 50000
 SIZE = 1024     # ver isso!!
 
@@ -24,21 +25,35 @@ with MySocket(socket.AF_INET, socket.SOCK_DGRAM) as s:
 socket_client = MySocket(socket.AF_INET, socket.SOCK_STREAM)
 socket_client.connect((server_HOST, server_PORT))
 
-d_files = socket_client.recv(SIZE*30)    # ajeitar tamanho!!
-d_files = pickle.loads(d_files) # transform data in list
+while(True):
+    menu_server = socket_client.recv(4096) # não sabia qual parametro colocar
+    menu_server = menu_server.decode() # turn bytes into str
 
-print('Available files:')
+    print(menu_server)
 
-# print file_names
-for i, file_name in enumerate(d_files):
-    print(i, '-', file_name)
+    choice = str(input('\nSua escolha:\n'))
 
-msg = input('\nWhich one do you want? ')
-socket_client.send(msg.encode())
+    socket_client.send(choice.encode())
 
-print('\nwaiting for file...')
-d_file = socket_client.recv(SIZE)
-print('received file:\n')
-print(d_file.decode())
+    #if not choice:
+    #    break
 
-socket_client.close()
+    # d_files = socket_client.recv(SIZE*30)    # receive files' list from server | ajeitar tamanho!!
+    # d_files = pickle.loads(d_files) # transform data in list
+
+
+    # print('Available files:')
+
+    # # print file_names
+    # for i, file_name in enumerate(d_files):
+    #     print(i, '-', file_name)
+
+    # msg = input('\nWhich one do you want? ')
+    # socket_client.send(msg.encode())
+
+    # print('\nwaiting for file...')
+    # d_file = socket_client.recv(SIZE)
+    # print('received file:\n')
+    # print(d_file.decode())
+
+    socket_client.close()
