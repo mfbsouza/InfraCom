@@ -23,39 +23,37 @@ server_socket = MySocket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.bind((self_HOST, self_PORT))
 server_socket.listen(1)
 
-while True:
-    conn, addr = server_socket.accept()
-    print('\nConnected to:', addr)
+conn, addr = server_socket.accept()
+print('\nConnected to:', addr)
 
-    menu = 'MENU\nDigite:\n1. Listar arquivos\n2. Solicitar arquivos\n3. Encerrar conexão\n'
+while True:
+    menu = '\n\nMENU\nDigite:\n1. Listar arquivos\n2. Solicitar arquivos\n3. Encerrar conexão\n'
     menu = menu.encode() # turn str type into bytes
     conn.send(menu)
 
-
-    client_choice = server_socket.recv(4096) # nao sabia qual parametro colocar
+    client_choice = conn.recv(SIZE) # nao sabia qual parametro colocar
     client_choice = client_choice.decode()
-    print('Servidor: ')
-    print(client_choice)
 
-    # files = listdir('../arquivos')  # list all files at the folder 'arquivos'
-    # d_files = pickle.dumps(files)   # serialize files
-    # conn.send(d_files)              # send files' list to client
+    if client_choice == '1': # list files
+        files = listdir('../arquivos')  # list all files at the folder 'arquivos'
+        d_files = pickle.dumps(files)   # serialize files
+        conn.send(d_files)              # send files' list to client
+    elif client_choice == '2': # send file
+        # send file
+        while conn:
+            dados = conn.recv(SIZE)     # receive data from client
+            if not dados: break
 
-    # print('CONN:')
-    # print(conn)
+            choosen_file = int(dados.decode())  # transform client's data in int
+            print('choosen file:', files[choosen_file])
 
-    # while conn:
-    #     dados = conn.recv(SIZE)     # receive data from client
-    #     if not dados: break
+            file = open('../arquivos/' + files[choosen_file], "r")
 
-    #     choosen_file = int(dados.decode())  # transform client's data in int
-    #     print('choosen file:', files[choosen_file])
+            print('sending file...')
+            d_file = file.read().encode()
+            conn.send(d_file) # send choosen file to client
+            print('file sent.')
+    elif client_choice == '3': # connection closed
+        conn.close()
 
-    #     file = open('../arquivos/' + files[choosen_file], "r")
-
-    #     print('sending file...')
-    #     d_file = file.read().encode()
-    #     conn.send(d_file) # send choosen file to client
-    #     print('file sent.')
-
-    conn.close()
+    # conn.close()

@@ -25,8 +25,8 @@ with MySocket(socket.AF_INET, socket.SOCK_DGRAM) as s:
 socket_client = MySocket(socket.AF_INET, socket.SOCK_STREAM)
 socket_client.connect((server_HOST, server_PORT))
 
-while(True):
-    menu_server = socket_client.recv(4096) # não sabia qual parametro colocar
+while True:
+    menu_server = socket_client.recv(SIZE) # não sabia qual parametro colocar
     menu_server = menu_server.decode() # turn bytes into str
 
     print(menu_server)
@@ -35,25 +35,25 @@ while(True):
 
     socket_client.send(choice.encode())
 
-    #if not choice:
-    #    break
-
-    # d_files = socket_client.recv(SIZE*30)    # receive files' list from server | ajeitar tamanho!!
-    # d_files = pickle.loads(d_files) # transform data in list
+    if choice == '1': # asks to list files
+        d_files = socket_client.recv(SIZE*30)    # receive files' list from server | ajeitar tamanho!!
+        d_files = pickle.loads(d_files) # transform data in list
 
 
-    # print('Available files:')
+        print('Available files:')
 
-    # # print file_names
-    # for i, file_name in enumerate(d_files):
-    #     print(i, '-', file_name)
+        # print file_names
+        for i, file_name in enumerate(d_files):
+            print(i, '-', file_name)
+        
+    elif choice == '2': # wants to receive a file
+        msg = input('\nWhich one do you want? ')
+        socket_client.send(msg.encode())
 
-    # msg = input('\nWhich one do you want? ')
-    # socket_client.send(msg.encode())
+        print('\nwaiting for file...')
+        d_file = socket_client.recv(SIZE)
+        print('received file:\n')
+        print(d_file.decode())
 
-    # print('\nwaiting for file...')
-    # d_file = socket_client.recv(SIZE)
-    # print('received file:\n')
-    # print(d_file.decode())
-
-    socket_client.close()
+    elif choice == '3':
+        socket_client.close() # connection closed
