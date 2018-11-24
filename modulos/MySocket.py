@@ -16,6 +16,7 @@ class MySocket(socket.socket):
 
     def sendArquive(self, arquive):
         print()
+
     def reciveArquive(self):
         print()
 
