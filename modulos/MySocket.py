@@ -22,10 +22,11 @@ class MySocket(socket.socket):
            print('Sent ',repr(l))
            l = f.read(bufferSize)
         f.close()
+        conn.send(0)
         print('Done sending')
 
-    def recieveArquive(self, bufferSize = 1024):
-        with open('received_file', 'wb') as f:
+    def recieveArquive(self, file_name, bufferSize = 1024):
+        with open(file_name, 'wb') as f:
             print ('file opened')
             while True:
                 print('receiving data...')
@@ -37,6 +38,7 @@ class MySocket(socket.socket):
                 f.write(data)
         f.close()
         print('Successfully get the file')
+    
 
     def recieveDataOfAnySize(self, bufferSize = 1024):
         while True:

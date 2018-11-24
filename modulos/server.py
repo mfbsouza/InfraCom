@@ -27,15 +27,15 @@ conn, addr = server_socket.accept()
 print('\nConnected to:', addr)
 
 while True:
-
+    files = listdir('../arquivos')
     client_choice = conn.recv(SIZE) # nao sabia qual parametro colocar
     client_choice = client_choice.decode()
 
     if client_choice == '1': # list files
-        files = listdir('../arquivos')  # list all files at the folder 'arquivos'
+          # list all files at the folder 'arquivos'
         d_files = pickle.dumps(files)   # serialize files
         conn.sendall(d_files)              # send files' list to client
-    elif client_choice == '4': # send file
+    elif client_choice == '2': # send file
         # send file
         dados = conn.recv(SIZE)
         if dados:

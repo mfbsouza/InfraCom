@@ -23,6 +23,8 @@ while True:
                 state = "domainNotFound"
             else:
                 server_HOST = data
+                socketClient = MySocket(socket.AF_INET, socket.SOCK_STREAM)
+                socketClient.connect((server_HOST, server_PORT))
                 state = "menu"
                 # print('Received', data.decode())
 
@@ -35,8 +37,6 @@ while True:
 
     elif state == "menu":
         # connect to server
-        socketClient = MySocket(socket.AF_INET, socket.SOCK_STREAM)
-        socketClient.connect((server_HOST, server_PORT))
         print(MENU)
         choice = str(input("\nType your choice's number\n"))
         socketClient.send(choice.encode())
@@ -58,14 +58,14 @@ while True:
         state = "menu"
 
     elif state == "recieveFile":
-        opt = '2'
-        socketClient.send(opt.encode())
         msg = input('\nWhich one do you want? ')
         socketClient.send(msg.encode())
         print('\nWaiting for file...')
-        dFile = socketClient.recieveArquive()
-        print('Received file:\n')
-        print(dFile.decode())
+        file_name = "temp_file"
+        if dFiles:
+            file_name = dFiles[int(msg)]
+        dFile = socketClient.recieveArquive(file_name)
+        print('Received file, saved as', file_name)
         state = "menu"
 
     elif state == "break":
