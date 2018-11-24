@@ -44,7 +44,9 @@ class MySocket(socket.socket):
             print("Receiving data...")
             data = self.recv(bufferSize)
             print('data=%s', (data))
-            if not data:
+            dataStr = str(data)
+            print(dataStr)
+            if dataStr:
                 break
             dataList.append(data)
         return b''.join(dataList)

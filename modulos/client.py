@@ -48,7 +48,7 @@ while True:
             state = "closeConnection"
 
     elif state == "recieveListOfFiles":
-        dFiles = socketClient.recieveDataOfAnySize() # receive files' list from server
+        dFiles = socketClient.recv(SIZE) # receive files' list from server
         dFiles = pickle.loads(dFiles) # transform data in list
         print('Available files:')
 
@@ -58,6 +58,8 @@ while True:
         state = "menu"
 
     elif state == "recieveFile":
+        opt = '2'
+        socketClient.send(opt.encode())
         msg = input('\nWhich one do you want? ')
         socketClient.send(msg.encode())
         print('\nWaiting for file...')

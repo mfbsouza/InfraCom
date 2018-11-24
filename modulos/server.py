@@ -27,9 +27,6 @@ conn, addr = server_socket.accept()
 print('\nConnected to:', addr)
 
 while True:
-    menu = '\n\nMENU\nDigite:\n1. Listar arquivos\n2. Solicitar arquivos\n3. Encerrar conexão\n'
-    menu = menu.encode() # turn str type into bytes
-    conn.send(menu)
 
     client_choice = conn.recv(SIZE) # nao sabia qual parametro colocar
     client_choice = client_choice.decode()
@@ -38,7 +35,7 @@ while True:
         files = listdir('../arquivos')  # list all files at the folder 'arquivos'
         d_files = pickle.dumps(files)   # serialize files
         conn.sendall(d_files)              # send files' list to client
-    elif client_choice == '2': # send file
+    elif client_choice == '4': # send file
         # send file
         dados = conn.recv(SIZE)
         if dados:
