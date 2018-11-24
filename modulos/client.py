@@ -55,13 +55,13 @@ while True:
         # print file_names
         for i, file_name in enumerate(dFiles):
             print(i, '-', file_name)
-        state = "recieveFile"
+        state = "menu"
 
     elif state == "recieveFile":
         msg = input('\nWhich one do you want? ')
         socketClient.send(msg.encode())
         print('\nWaiting for file...')
-        dFile = socketClient.reciveArquive()
+        dFile = socketClient.recieveArquive()
         print('Received file:\n')
         print(dFile.decode())
         state = "menu"

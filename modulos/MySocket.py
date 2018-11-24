@@ -24,7 +24,7 @@ class MySocket(socket.socket):
         f.close()
         print('Done sending')
 
-    def reciveArquive(self, bufferSize = 1024):
+    def recieveArquive(self, bufferSize = 1024):
         with open('received_file', 'wb') as f:
             print ('file opened')
             while True:

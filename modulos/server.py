@@ -37,22 +37,30 @@ while True:
     if client_choice == '1': # list files
         files = listdir('../arquivos')  # list all files at the folder 'arquivos'
         d_files = pickle.dumps(files)   # serialize files
-        conn.send(d_files)              # send files' list to client
+        conn.sendall(d_files)              # send files' list to client
     elif client_choice == '2': # send file
         # send file
-        while conn:
-            dados = conn.recv(SIZE)     # receive data from client
-            if not dados: break
-
-            choosen_file = int(dados.decode())  # transform client's data in int
-            print('choosen file:', files[choosen_file])
-
-            file = open('../arquivos/' + files[choosen_file], "r")
-
+        dados = conn.recv(SIZE)
+        if dados:
+            choosenFile = int(dados.decode())
+            print('choosen file:', files[choosenFile])
             print('sending file...')
-            d_file = file.read().encode()
-            conn.send(d_file) # send choosen file to client
+            server_socket.sendArquive('../arquivos/' + files[choosenFile], conn, SIZE)
             print('file sent.')
+
+        # while conn:
+        #     dados = conn.recv(SIZE)     # receive data from client
+        #     if not dados: break
+
+        #     choosen_file = int(dados.decode())  # transform client's data in int
+        #     print('choosen file:', files[choosen_file])
+
+        #     file = open('../arquivos/' + files[choosen_file], "r")
+
+        #     print('sending file...')
+        #     d_file = file.read().encode()
+        #     conn.send(d_file) # send choosen file to client
+        #     print('file sent.')
     elif client_choice == '3': # connection closed
         conn.close()
 
