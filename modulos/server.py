@@ -60,5 +60,6 @@ while True:
         #     print('file sent.')
     elif client_choice == '3': # connection closed
         conn.close()
+        break
 
     # conn.close()

@@ -22,18 +22,18 @@ class MySocket(socket.socket):
            print('Sent ',repr(l))
            l = f.read(bufferSize)
         f.close()
-        conn.send(0)
+        conn.send(b'$')
         print('Done sending')
 
     def recieveArquive(self, file_name, bufferSize = 1024):
+        print('receiving data...')
         with open(file_name, 'wb') as f:
-            print ('file opened')
-            while True:
-                print('receiving data...')
+            done = False
+            while not done:
                 data = self.recv(bufferSize)
-                print('data=%s', (data))
-                if not data:
-                    break
+                if data.endswith(b'$'):
+                    done = True
+                    data = data[:len(data)-1]
                 # write data to a file
                 f.write(data)
         f.close()

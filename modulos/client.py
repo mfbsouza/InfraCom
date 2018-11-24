@@ -11,6 +11,7 @@ SIZE = 1024     # ver isso!!
 state = "requestServerIP"
 MENU = '\n\nMENU\nDigite:\n1. Listar arquivos\n2. Solicitar arquivos\n3. Encerrar conexão\n'
 
+dFiles = None
 while True:
     if state == "requestServerIP":
         # send server's domain to DNS and get its IP
