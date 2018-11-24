@@ -14,11 +14,37 @@ class MySocket(socket.socket):
         message = "0" + domainString
         self.sendto(message.encode(), (dnsIP, dnsPort))
 
-    def sendArquive(self, arquive):
-        print()
+    def sendArquive(self, arquive, conn: socket.socket, bufferSize = 1024):
+        f = open(arquive,'rb')
+        l = f.read(1024)
+        while (l):
+           conn.send(l)
+           print('Sent ',repr(l))
+           l = f.read(bufferSize)
+        f.close()
+        print('Done sending')
 
-    def reciveArquive(self):
-        print()
+    def reciveArquive(self, bufferSize = 1024):
+        with open('received_file', 'wb') as f:
+            print ('file opened')
+            while True:
+                print('receiving data...')
+                data = self.recv(bufferSize)
+                print('data=%s', (data))
+                if not data:
+                    break
+                # write data to a file
+                f.write(data)
+        f.close()
+        print('Successfully get the file')
 
-    def recieveDataOfAnySize(self):
-        print()
+    def recieveDataOfAnySize(self, bufferSize = 1024):
+        while True:
+            dataList = []
+            print("Receiving data...")
+            data = self.recv(bufferSize)
+            print('data=%s', (data))
+            if not data:
+                break
+            dataList.append(data)
+        return b''.join(dataList)
