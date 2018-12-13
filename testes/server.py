@@ -38,8 +38,6 @@ while True:
         rcv_base = seq_number
 
     if client_choice == '0':    # send menu
-        # next_seq = s.send_message(MENU, next_seq, rcv_base, addr)
-
         segments, next_seq = s.fragment_message(MENU, next_seq)
         for segment in segments:
             s.send_segment(segment, rcv_base, addr)

@@ -16,7 +16,10 @@ while True:
     if state == "menu":
         # request menu
         request_msg = '0'
-        s.send_message(request_msg, next_seq, rcv_base, (SERVER_HOST, SERVER_PORT))
+
+        segments, next_seq = s.fragment_message(request_msg, next_seq)
+        for segment in segments:
+            s.send_segment(segment, rcv_base, (SERVER_HOST, SERVER_PORT))
 
         # receive menu
         while True:
