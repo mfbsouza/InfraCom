@@ -1,5 +1,6 @@
 import socket
 from Segment import Segment
+import random
 
 MESSAGE_SIZE = 1024
 HEADER_SIZE = 11
@@ -71,6 +72,11 @@ class MySocket(socket.socket):
             else:
                 segment = Segment(self.next_seq, last_frag='0', data=msg[:(DATA_SIZE-1)])
             
+            if self.next_seq == 0:
+                self.next_seq = 1
+            else:
+                self.next_seq = 0
+                
             segments.append(segment)
             msg = msg[DATA_SIZE:]
 
@@ -109,8 +115,18 @@ class MySocket(socket.socket):
         return segment, addr
 
     def send_ack(self, ack_nunmber, dest_addr):
-        ack = Segment(ack_number=ack_nunmber)
-        self.sendto(ack.segment.encode(), dest_addr)
+        if random.randint(0, 100) >= 50:   # perda de ACK!!
+            ack = Segment(ack_number=ack_nunmber)
+            self.sendto(ack.segment.encode(), dest_addr)
+            print('ACK', ack_nunmber , 'enviado')
+        else:
+            print('ACK', ack_nunmber , 'perdido')
+
+    def resend_last_ack(self, dest_addr):
+        if self.next_ack == 0:
+            self.send_ack(1, dest_addr)
+        else:
+            self.send_ack(0, dest_addr)
 
     # send msg with any size to a destination   (fragment the msg, send it and wait for ACK)
     def send_message(self, msg, dest_addr):
@@ -125,28 +141,36 @@ class MySocket(socket.socket):
         while True:
             if state == "send_0":
                 self.sendto(segments[i].segment.encode(), dest_addr)
-                self.next_seq = 1
 
                 state = "wait_for_ack_0"
             elif state == "wait_for_ack_0":
                 ack, addr = self.receive_segment()
-                
-                if ack.ack_number == 0:
+
+                if ack.ack_number == 1:
+                    self.sendto(segments[i].segment.encode(), dest_addr)
+                elif ack.ack_number == 0:
                     print('received ack 0')
                     i += 1
                     state = "send_1"
+                else:
+                    print('not ACK')
+                    self.resend_last_ack(dest_addr)
             elif state == "send_1":
                 self.sendto(segments[i].segment.encode(), dest_addr)
-                self.next_seq = 0
 
                 state = "wait_for_ack_1"
             elif state == "wait_for_ack_1":
-                ack = self.receive_segment()
+                ack, addr = self.receive_segment()
 
-                if ack.ack_number == 1:
+                if ack.ack_number == 0:
+                    self.sendto(segments[i].segment.encode(), dest_addr)
+                elif ack.ack_number == 1:
                     print('received ack 1')
                     i += 1
                     state = "send_0"
+                else:
+                    print('not ACK')
+                    self.resend_last_ack(dest_addr)
             elif state == "break":
                 break
 
