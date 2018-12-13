@@ -1,7 +1,7 @@
 import socket
 
 MESSAGE_SIZE = 1024
-HEADER_SIZE = 10
+HEADER_SIZE = 11
 DATA_SIZE = MESSAGE_SIZE - HEADER_SIZE
 
 class MySocket(socket.socket):
@@ -29,14 +29,10 @@ class MySocket(socket.socket):
         return fragments, seq_number
 
     # add a header (4 bytes for sequence number + 4 bytes for next ack number) to a segment's data
-    def add_header_to_segment(self, data, seq_number, ack_number=-1, last_frag='0'):
+    def add_header_to_segment(self, data, seq_number, ack_number=-1, syn='0', fin='0', last_frag='0'):
         ack_number = int(ack_number)
-        ack_valid = '1'
-        
-        if ack_number == -1:
-            ack_valid = '0'
 
-        segment = ('%04d' % seq_number) + ('%04d' % ack_number) + last_frag + ack_valid + data
+        segment = ('%04d' % seq_number) + ('%04d' % ack_number) + last_frag + syn + fin + data
 
         # print(segment)
         return segment

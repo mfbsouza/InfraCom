@@ -23,13 +23,15 @@ while True:
     seq_number = int(segment[:4])
     ack_number = int(segment[4:8])
     last_frag = segment[8]
-    ack_valid = segment[9]
-    client_choice = segment[10:]
+    syn = segment[9]
+    fin = segment[10]
+    client_choice = segment[11:]
 
     print('seq_number:', seq_number)
     print('ack_number:', ack_number)
     print('last_frag:', last_frag)
-    print('ack_valid:', ack_valid)
+    print('syn:', syn)
+    print('fin:', fin)
     print('client_choice:', client_choice)
 
     ## analyze segment
