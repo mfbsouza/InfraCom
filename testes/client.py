@@ -7,7 +7,7 @@ SERVER_PORT = 50004
 # # # # # # # # # #
 snd_base = 38       # # # # # # # # # # (random)
 next_seq = snd_base
-rcv_base = 9999
+rcv_base = -1
 
 state = "menu"
 
@@ -28,11 +28,13 @@ while True:
             seq_number = int(segment[:4])
             ack_number = int(segment[4:8])
             last_frag = segment[8]
-            server_reply = segment[9:]
+            ack_valid = segment[9]
+            server_reply = segment[10:]
 
             print('seq_number:', seq_number)
             print('ack_number:', ack_number)
             print('last_frag:', last_frag)
+            print('ack_valid:', ack_valid)
             print('server_reply:', server_reply)
 
             # stop receiving after last fragment

@@ -1,16 +1,22 @@
 import socket
 
 MESSAGE_SIZE = 1024
-HEADER_SIZE = 9
+HEADER_SIZE = 10
 DATA_SIZE = MESSAGE_SIZE - HEADER_SIZE
 
 class MySocket(socket.socket):
-    # get a message of any size and return a list of fragments of that message, each one withthe size equal to DATA_SIZE or smaller
-    def fragment_message(self, msg):
+    # get a message of any size and return a list of fragments of that message, each one with the size equal to DATA_SIZE or smaller. Also adds a header to each fragment
+    def fragment_message(self, msg, seq_number):
         fragments = []
         
         while len(msg) > 0:
-            fragments.append(msg[:(DATA_SIZE-1)])
+            if len(msg) < DATA_SIZE:
+                fragment = self.add_header_to_segment(msg[:(DATA_SIZE-1)], seq_number, '1')
+            else:
+                fragment = self.add_header_to_segment(msg[:(DATA_SIZE-1)], seq_number)
+            
+            fragments.append(fragment)
+            seq_number += 1
             msg = msg[DATA_SIZE:]
 
         # print('fragments:\n')
@@ -20,27 +26,37 @@ class MySocket(socket.socket):
         #     print()
         #     i += 1
 
-        return fragments
+        return fragments, seq_number
 
     # add a header (4 bytes for sequence number + 4 bytes for next ack number) to a segment's data
-    def add_header_to_segment(self, data, seq_number, ack_number, last_frag='0'):
-        segment = ('%04d' % seq_number) + ('%04d' % ack_number) + last_frag + data
+    def add_header_to_segment(self, data, seq_number, ack_number=-1, last_frag='0'):
+        ack_number = int(ack_number)
+        ack_valid = '1'
+        
+        if ack_number == -1:
+            ack_valid = '0'
+
+        segment = ('%04d' % seq_number) + ('%04d' % ack_number) + last_frag + ack_valid + data
 
         # print(segment)
         return segment
 
+    def set_ack_number(self, segment, ack_number):
+        segment = segment[:4] + ('%04d' % ack_number) + segment[8:]
 
-    # send message to specified destination (fragmented, if necessary)
-    def send_message(self, msg, seq_number, ack_number, dest_addr):
-        message_fragments = self.fragment_message(msg)
+        return segment
 
-        for i, fragment in enumerate(message_fragments):
-            if i == (len(message_fragments) - 1):
-                fragment = self.add_header_to_segment(fragment, seq_number, ack_number, '1')
-            else:
-                fragment = self.add_header_to_segment(fragment, seq_number, ack_number)
+    # # send message to specified destination (fragmented, if necessary)
+    # def send_message(self, fragments, seq_number, ack_number, dest_addr):
+    #     for i, fragment in enumerate(fragments):
+    #         if i == (len(fragments) - 1):
+    #             fragment = self.add_header_to_segment(fragment, seq_number, ack_number, '1')
+    #         else:
+    #             fragment = self.add_header_to_segment(fragment, seq_number, ack_number)
 
-            self.sendto(fragment.encode(), dest_addr)
-            seq_number += 1
+    #         self.sendto(fragment.encode(), dest_addr)
 
-        return seq_number
+    def send_segment(self, segment, ack_number, dest_addr):
+        segment = self.set_ack_number(segment, ack_number)
+
+        self.sendto(segment.encode(), dest_addr)
