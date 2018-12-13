@@ -1,5 +1,7 @@
 from socket import AF_INET, SOCK_DGRAM
 from MySocket import MySocket, MESSAGE_SIZE
+from Segment import Segment
+from Helper import *
 
 SERVER_HOST = ''
 SERVER_PORT = 50004
@@ -9,9 +11,22 @@ snd_base = 38       # # # # # # # # # # (random)
 next_seq = snd_base
 rcv_base = -1
 
-state = "menu"
+state = "send_syn"
 
 s = MySocket(AF_INET, SOCK_DGRAM)
+while True:
+    if state == "send_syn": # send connection request to server
+        connection_request = Segment(next_seq, rcv_base, syn='1')
+        s.send_segment(connection_request, rcv_base, (SERVER_HOST, SERVER_PORT))
+
+        # wait for ack and port number
+
+        state = "break"
+    elif state == "break":
+        state = "menu"
+        break
+
+
 while True:
     if state == "menu":
         # request menu
@@ -24,26 +39,14 @@ while True:
         # receive menu
         while True:
             ## receive segment
-            segment, addr = s.recvfrom(MESSAGE_SIZE)
-            segment = segment.decode()
+            data, addr = s.recvfrom(MESSAGE_SIZE)
+            data = data.decode()
 
-            # separate segment's fields
-            seq_number = int(segment[:4])
-            ack_number = int(segment[4:8])
-            last_frag = segment[8]
-            syn = segment[9]
-            fin = segment[10]
-            server_reply = segment[11:]
-
-            print('seq_number:', seq_number)
-            print('ack_number:', ack_number)
-            print('last_frag:', last_frag)
-            print('syn:', syn)
-            print('fin:', fin)
-            print('server_reply:', server_reply)
-
+            segment = Segment(segment = data)
+            segment.print()
+            
             # stop receiving after last fragment
-            if last_frag == '1':
+            if segment.last_frag == '1':
                 break
 
         state = "break"
