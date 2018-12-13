@@ -1,7 +1,6 @@
 from socket import AF_INET, SOCK_DGRAM
 from MySocket import MySocket, MESSAGE_SIZE
 from Segment import Segment
-from Helper import *
 
 SELF_HOST = ''
 SELF_PORT = 50004
@@ -34,7 +33,7 @@ while True:
 
             # send ack
             # send port number
-            
+
         state = "break"
     elif state == "break":
         break

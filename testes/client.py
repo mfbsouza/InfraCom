@@ -1,7 +1,6 @@
 from socket import AF_INET, SOCK_DGRAM
 from MySocket import MySocket, MESSAGE_SIZE
 from Segment import Segment
-from Helper import *
 
 SERVER_HOST = ''
 SERVER_PORT = 50004
