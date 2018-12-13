@@ -81,3 +81,19 @@ class MySocket(socket.socket):
         #     print(segment + '\n')
 
         return segments, seq_number
+
+    def receive_segment(self, rcv_base):
+        data, addr = self.recvfrom(MESSAGE_SIZE)
+        data = data.decode()
+
+        segment = Segment(segment=data)
+        print('received:')
+        segment.print()
+
+        if rcv_base == -1 or rcv_base == segment.seq_number:
+            rcv_base = segment.seq_number + 1
+        else:
+            # check!!!
+            print('received wrong segment')
+
+        return segment, rcv_base, addr
