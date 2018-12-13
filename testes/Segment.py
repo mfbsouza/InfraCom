@@ -28,3 +28,4 @@ class Segment:
         print('syn:', self.syn)
         print('fin:', self.fin)
         print('data:', self.data)
+        print()
