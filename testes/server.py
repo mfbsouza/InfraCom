@@ -2,23 +2,38 @@ from socket import AF_INET, SOCK_DGRAM
 from MySocket import MySocket, MESSAGE_SIZE
 from Segment import Segment
 
+# # # # # CONSTANTS # # # # #
+
+DNS_HOST = ''
+DNS_PORT = 49152
+
 SELF_HOST = ''
 SELF_PORT = 50004
 
 MENU = '\n\nMENU\nDigite:\n1. Listar arquivos\n2. Solicitar arquivos\n3. Encerrar conexão\n'
 
+# # # # # VARIABLES # # # # #
+
 client_sockets = {}
 state = "listen"
 
-# # # # # # # # # #
 snd_base = 57       # # # # # # # # # # (random)
 next_seq = snd_base
 rcv_base = -1
 
+# # # # # MAIN # # # # #
+
+# send IP and domain to DNS
+with MySocket(AF_INET, SOCK_DGRAM) as dns_socket:
+    dns_socket.dnsRegisterDomain("bois.com", DNS_HOST, DNS_PORT)
+    data = dns_socket.recv(MESSAGE_SIZE)
+    print('Received', data.decode())
+    dns_socket.close()
+
+# connect to client
 s = MySocket(AF_INET, SOCK_DGRAM)
 s.bind((SELF_HOST, SELF_PORT))
 
-# connect to client
 while True:
     if state == "listen":   # wait for connection request
         data, addr = s.recvfrom(MESSAGE_SIZE)
