@@ -12,12 +12,21 @@ server_PORT = 50000
 
 state = "requestServerIP" # initial state
 
+list_of_files = ''
+
+def getFileName(file_number):
+    if len(list_of_files) > 0:
+        files = list_of_files.split('\n')[1:]   # files: [i - fileName.txt]
+        return files[file_number-1].split(' - ')[1]
+    else:
+        return ''
+
 if __name__ == "__main__":
     while True:
         if state == "requestServerIP":
             # send server's domain to DNS and get its IP
             with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
-                domainString = "bois.com"
+                domainString = input('Enter the domain you want to access: ')
                 message = "1" + domainString
                 s.sendto(message.encode(), (DNS_HOST, DNS_PORT))
                 dns_data, addr = s.recvfrom(1024)
@@ -66,7 +75,22 @@ if __name__ == "__main__":
             state = "menu" # goes back to menu
         
         elif state == "recieveFile":
-            pass
+            # send the name of the chosen file
+            file_number = int(input('\nWhich one do you want? '))
+            file_name = getFileName(file_number)
+
+            client.send_msg(file_name.encode())
+            print('\nWaiting for file...')
+
+            # receive file
+            file_data = client.recv_msg()
+            # save file
+            f = open('../arquivos/cliente/' + file_name, 'wb')
+            f.write(file_data)
+            f.close()
+            print('Received file, saved as', file_name)
+            
+            state = "menu" # goes back to menu
         
         elif state == "closeConnection":
             pass
