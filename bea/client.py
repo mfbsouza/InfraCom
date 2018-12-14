@@ -1,4 +1,5 @@
 from udp_socket import SocketUDP
+import utils
 import socket
 
 DNS_HOST = ''
