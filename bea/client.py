@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from udp_socket import SocketUDP
 import utils
 import socket
@@ -59,12 +60,9 @@ if __name__ == "__main__":
                 state = "closeConnection"
 
         elif state == "recieveListOfFiles":
-            dFiles = client.recv_msg() # receive files' list from server
-            dFiles = pickle.loads(dFiles) # transform data in list
-            
-            print('Available files:')
-            for i, file_name in enumerate(dFiles): # print file_names
-                print(i, '-', file_name)
+            list_of_files = client.recv_msg().decode()
+            print(list_of_files)
+
             state = "menu" # goes back to menu
         
         elif state == "recieveFile":

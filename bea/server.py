@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from udp_socket import SocketUDP
 import utils
 import socket
@@ -11,6 +12,15 @@ self_HOST = ''
 self_PORT = 50000
 
 MENU = '\n\nMENU\nDigite:\n1. Listar arquivos\n2. Solicitar arquivos\n3. Encerrar conexão\n'
+
+def listFiles():
+    files = listdir('../arquivos') # list of available files
+    list_of_files = ''
+
+    for i, file in enumerate(files):
+        list_of_files += '\n' + str(i) + ' - ' + file
+
+    return list_of_files
 
 if __name__ == "__main__":
 # send IP and domain to DNS
@@ -35,13 +45,13 @@ if __name__ == "__main__":
 
         client_choice = server.recv_msg().decode()
 
-        if client_choice == 1: # recieveListOfFiles
-            d_files = pickle.dumps(files)   # serialize files
-            server.send_msg(d_files)
+        if client_choice == "1": # recieveListOfFiles
+            list_of_files = listFiles()
+            server.send_msg(list_of_files.encode())
 
-        elif client_choice == 2: # recieveFile
+        elif client_choice == "2": # recieveFile
             pass
         
-        elif client_choice == 3: # closeConnection
+        elif client_choice == "3": # closeConnection
             pass
             break
