@@ -1,6 +1,7 @@
 from udp_socket import SocketUDP
 import utils
 import socket
+import pickle
 
 DNS_HOST = ''
 DNS_PORT = 49152
@@ -39,9 +40,36 @@ if __name__ == "__main__":
                 state = "requestServerIP"
             elif m == "n":
                 state = "break"
+        
         elif state == "break":
             break
+        
         elif state == "menu":
-            # connect to server
-            print("you did it")
-            break
+            # receive menu and send choice
+            menu = client.recv_msg().decode()
+            print(menu)
+            choice = str(input("\nType your choice's number\n"))
+            client.send_msg(choice.encode())
+
+            if choice == "1":
+                state = "recieveListOfFiles"
+            elif choice == "2":
+                state = "recieveFile"
+            elif choice == "3":
+                state = "closeConnection"
+
+        elif state == "recieveListOfFiles":
+            dFiles = client.recv_msg() # receive files' list from server
+            dFiles = pickle.loads(dFiles) # transform data in list
+            
+            print('Available files:')
+            for i, file_name in enumerate(dFiles): # print file_names
+                print(i, '-', file_name)
+            state = "menu" # goes back to menu
+        
+        elif state == "recieveFile":
+            pass
+        
+        elif state == "closeConnection":
+            pass
+            status = "break"

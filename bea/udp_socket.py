@@ -34,7 +34,7 @@ class SocketUDP:
         syn_msg = Package(self.__seq, 0, False, True, True).encode()
         cur_try = 0
         other_seq = None
-        while cur_try < Package.NUMBER_OF_RETRIES:
+        while cur_try < Package.NUMBER_OF_RETRIES: # checks deadlock, tries 5 times
             self.__socket.sendto(syn_msg, addr)
             shared_other_seq = Value('i')
             recv_thrd = Process(target=SocketUDP.recv_syn_res, args=(self.__socket, shared_other_seq))

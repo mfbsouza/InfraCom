@@ -1,6 +1,8 @@
 from udp_socket import SocketUDP
 import utils
 import socket
+import pickle
+from os import listdir
 
 DNS_HOST = ''
 DNS_PORT = 49152
@@ -26,4 +28,20 @@ if __name__ == "__main__":
     server.send_msg("Connection established @ client side".encode())
     print(msg.decode())
 
-    # make message trade
+    files = listdir('../arquivos') # list of available files
+
+    while True: # reliable message trade
+        server.send_msg(MENU.encode()) # send menu to client
+
+        client_choice = server.recv_msg().decode()
+
+        if client_choice == 1: # recieveListOfFiles
+            d_files = pickle.dumps(files)   # serialize files
+            server.send_msg(d_files)
+
+        elif client_choice == 2: # recieveFile
+            pass
+        
+        elif client_choice == 3: # closeConnection
+            pass
+            break
