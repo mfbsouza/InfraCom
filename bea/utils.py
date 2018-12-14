@@ -18,7 +18,7 @@ class Package:
         package += self.data.decode()
         return package.encode()
 
-    @staticmethod
+    @staticmethod # this function behaves like a plain function
     def decode(package):
         package = package.decode()
         seq = int(package[0:32], 2)

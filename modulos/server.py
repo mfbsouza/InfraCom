@@ -13,7 +13,7 @@ SIZE = 1024     # ver isso!!
 # send IP and domain to DNS
 with MySocket(socket.AF_INET, socket.SOCK_DGRAM) as s:
     s.dnsRegisterDomain("bois.com", DNS_HOST, DNS_PORT)
-    data = s.recv(1024)
+    data, addr = s.recvfrom(1024)
     print('Received', data.decode())
 
 
