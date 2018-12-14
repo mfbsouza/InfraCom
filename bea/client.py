@@ -9,6 +9,7 @@ server_HOST = ''
 server_PORT = 50000
 
 state = "requestServerIP" # initial state
+MENU = '\n\nMENU\nDigite:\n1. Listar arquivos\n2. Solicitar arquivos\n3. Encerrar conexão\n'
 
 if __name__ == "__main__":
     while True:
@@ -28,8 +29,8 @@ if __name__ == "__main__":
 
                     client = SocketUDP()
                     client.connect(server_HOST, server_PORT)
-                    client.send_msg("Connection established @ server side".encode())
-                    print(client.recv_msg().decode())
+                    #client.send_msg("Connection established @ server side".encode())
+                    #print(client.recv_msg().decode())
 
                     state = "menu"
 
@@ -43,5 +44,37 @@ if __name__ == "__main__":
             break
         elif state == "menu":
             # connect to server
-            print("you did it")
+            print(MENU)
+            choice = str(input("\nType your choice's number\n"))
+            client.send_msg(choice.encode())
+            if choice == "1":
+                state = "recieveListOfFiles"
+            elif choice == "2":
+                state = "recieveFile"
+            elif choice == "3":
+                state = "closeConnection"
+
+        elif state == "recieveListOfFiles":
+            dFiles = client.recv_msg() # receive files' list from server
+            print('Available files: \n', dFiles.decode())
+
+            # # print file_names
+            # for i, file_name in enumerate(dFiles):
+            #     print(i, '-', file_name)
+            state = "menu"
+
+        elif state == "recieveFile": 
+            msg = input('\nWhich one do you want? ')
+            client.send_msg(msg.encode())
+            print('\nWaiting for file...')
+            #file_name = "temp_file"
+            received_file = client.recv_msg()
+            print('Received file: \n', received_file.decode())
+            state = "menu"
+
+        elif state == "break":
             break
+
+        elif state== "closeConnection":
+            client.close()
+            state = "break"
