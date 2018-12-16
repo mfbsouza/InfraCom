@@ -9,6 +9,9 @@ class Package:
         self.is_end = is_end
         self.data = data
 
+    def content(self):
+        return self.data
+
     def encode(self):
         package = '{0:032b}'.format(self.seq)
         package += '{0:032b}'.format(self.ack)

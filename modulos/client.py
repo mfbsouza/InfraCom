@@ -93,5 +93,7 @@ if __name__ == "__main__":
             state = "menu" # goes back to menu
         
         elif state == "closeConnection":
-            pass
+            # close_message = "close"
+            # client.send_msg(close_message.encode())
+
             status = "break"

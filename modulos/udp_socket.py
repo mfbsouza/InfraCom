@@ -113,6 +113,9 @@ class SocketUDP:
             if not ok:
                 raise Exception(str(to_addr) + " is not responding :/")
 
+            # if msg.content().decode() == "close": # if msg content is "close", get out of the loop, thread dies
+            #     break
+
     @staticmethod
     def recv_loop(sock, acks_buffer, recv_buffer, send_buffer, to_addr):
         while True:
@@ -125,3 +128,6 @@ class SocketUDP:
             else:
                 recv_buffer.put(package)
                 sock.sendto(Package(0, package.seq + 1, True, False, False).encode(), to_addr)
+
+            # if data.decode()[-5:] == "close": # if msg received is "close", get out of the loop, thread dies
+            #     break
