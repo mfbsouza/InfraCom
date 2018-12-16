@@ -59,5 +59,6 @@ if __name__ == "__main__":
             server.send_msg(file_data)
         
         elif client_choice == "3": # closeConnection
-            # client_close_msg = server.recv_msg().decode()
+            server.close()
+            
             break

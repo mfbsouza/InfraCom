@@ -1,12 +1,13 @@
 class Package:
     MAX_DATA_SIZE = 900
     NUMBER_OF_RETRIES = 5
-    def __init__(self, seq, ack, is_ack, is_syn, is_end, data=b''):
+    def __init__(self, seq, ack, is_ack, is_syn, is_end, data=b'', is_fin=False):
         self.seq = seq
         self.ack = ack
         self.is_ack = is_ack
         self.is_syn = is_syn
         self.is_end = is_end
+        self.is_fin = is_fin
         self.data = data
 
     def content(self):
@@ -18,6 +19,7 @@ class Package:
         package += '{0:01b}'.format(self.is_ack)
         package += '{0:01b}'.format(self.is_syn)
         package += '{0:01b}'.format(self.is_end)
+        package += '{0:01b}'.format(self.is_fin)
         package += self.data.decode()
         return package.encode()
 
@@ -29,5 +31,6 @@ class Package:
         is_ack = bool(int(package[64:65]))
         is_syn = bool(int(package[65:66]))
         is_end = bool(int(package[66:67]))
-        data = package[67:].encode()
-        return Package(seq, ack, is_ack, is_syn, is_end, data)
+        is_fin = bool(int(package[67:68]))
+        data = package[68:].encode()
+        return Package(seq, ack, is_ack, is_syn, is_end, data, is_fin)

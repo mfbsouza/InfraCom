@@ -69,8 +69,15 @@ class SocketUDP:
             
     @staticmethod
     def recv_syn_res(sock, shared_other_seq):
-        data, other = sock.recvfrom(1024)
+        data, _ = sock.recvfrom(1024)
         shared_other_seq.value = Package.decode(data).seq
+
+    def close(self):
+        # send fin_msg and break send_loop
+        fin_msg = Package(self.__seq, self.__other_seq, False, False, True, is_fin=True)
+        self.__send_buffer.put(fin_msg)
+
+        print('Closing connection...')
 
     def send_msg(self, msg):
         begin = 0
@@ -97,36 +104,35 @@ class SocketUDP:
     @staticmethod
     def send_loop(sock, send_buffer, acks_buffer, to_addr):
         while True:
-            msg = send_buffer.get()
-            # if msg.content().decode() == "close": # if msg content is "close", get out of the loop, thread dies
-            #     break
+            package = send_buffer.get()
             ok = False
             cur_try = 0
             while cur_try < Package.NUMBER_OF_RETRIES:
-                sock.sendto(msg.encode(), to_addr)
+                sock.sendto(package.encode(), to_addr)
                 try:
                     ack = acks_buffer.get(True, 1)
-                    if ack.ack > msg.seq:
+                    if ack.ack > package.seq:
                         ok = True
                         break
                 except Exception:
                     cur_try += 1
                     pass
+            if package.is_fin:
+                break
             if not ok:
                 raise Exception(str(to_addr) + " is not responding :/")
-
 
     @staticmethod
     def recv_loop(sock, acks_buffer, recv_buffer, send_buffer, to_addr):
         while True:
-            data, client = sock.recvfrom(1024)
+            data, _ = sock.recvfrom(1024)
             package = Package.decode(data)
             if package.is_ack:
                 acks_buffer.put(package)
             elif package.is_syn:
                 sock.sendto(Package(0, package.seq + 1, True, False, False).encode(), to_addr)
-            # elif data.decode()[-5:] == "close":
-            #     break
+            elif package.is_fin:
+                break
             else:
                 recv_buffer.put(package)
                 sock.sendto(Package(0, package.seq + 1, True, False, False).encode(), to_addr)

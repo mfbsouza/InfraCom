@@ -51,10 +51,6 @@ if __name__ == "__main__":
             elif m == "n":
                 state = "break"
         
-        elif state == "break":
-            print('got into break state')
-            break
-        
         elif state == "menu":
             # receive menu and send choice
             menu = client.recv_msg().decode()
@@ -94,7 +90,9 @@ if __name__ == "__main__":
             state = "menu" # goes back to menu
         
         elif state == "closeConnection":
-            # close_message = "close"
-            # client.send_msg(close_message.encode())
+            client.close()
 
             state = "break"
+
+        elif state == "break":
+            break
