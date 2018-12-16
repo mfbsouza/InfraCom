@@ -1,6 +1,6 @@
 class Package:
     MAX_DATA_SIZE = 900
-    NUMBER_OF_RETRIES = 5
+    NUMBER_OF_RETRIES = 15
     def __init__(self, seq, ack, is_ack, is_syn, is_end, data=b'', is_fin_1=False, is_fin_2=False):
         self.seq = seq
         self.ack = ack
@@ -37,3 +37,15 @@ class Package:
         is_fin_2 = bool(int(package[68:69]))
         data = package[69:].encode()
         return Package(seq, ack, is_ack, is_syn, is_end, data, is_fin_1, is_fin_2)
+
+    # def print(self):
+    #     print()
+    #     print('seq:', self.seq)
+    #     print('ack:', self.ack)
+    #     print('is_ack:', self.is_ack)
+    #     print('is_syn:', self.is_syn)
+    #     print('is_end:', self.is_end)
+    #     print('is_fin_1:', self.is_fin_1)
+    #     print('is_fin_2:', self.is_fin_2)
+    #     print('data:', self.data)
+    #     print()

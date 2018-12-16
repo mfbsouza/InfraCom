@@ -19,6 +19,16 @@ class SocketUDP:
         self.__recv_buffer = Queue()
         self.__acks_buffer = Queue()
 
+    @staticmethod
+    def send_package(sock, package, to_addr):
+        pkg = Package.decode(package)
+
+        if random.randint(0,100) <= 50:     # 50% change of losing the package
+            sock.sendto(package, to_addr)
+            # print('sent package', pkg.seq)
+        # else:
+            # print('lost package', pkg.seq)
+
     def start(self):
         Thread(target=SocketUDP.recv_loop, args=(self.__socket, self.__acks_buffer, self.__recv_buffer, self.__send_buffer, self.__other_addr)).start()
         Thread(target=SocketUDP.send_loop, args=(self.__socket, self.__send_buffer, self.__acks_buffer, self.__other_addr)).start()
@@ -35,7 +45,7 @@ class SocketUDP:
         cur_try = 0
         other_seq = None
         while cur_try < Package.NUMBER_OF_RETRIES: # checks deadlock, tries 5 times
-            self.__socket.sendto(syn_msg, addr)
+            SocketUDP.send_package(self.__socket, syn_msg, addr)
             shared_other_seq = Value('i')
             recv_thrd = Process(target=SocketUDP.recv_syn_res, args=(self.__socket, shared_other_seq))
             recv_thrd.start()
@@ -50,7 +60,8 @@ class SocketUDP:
         if other_seq is not None:
             self.__other_addr = addr
             self.__other_seq = other_seq
-            self.__socket.sendto(Package(self.__seq, self.__other_seq + 1, True, False, True).encode(), addr)
+            self.__seq += 1
+            SocketUDP.send_package(self.__socket, Package(self.__seq, self.__other_seq + 1, True, False, True).encode(), addr)
             return True
         else:
             return False
@@ -75,6 +86,7 @@ class SocketUDP:
     def close(self):
         # send fin_msg and break send_loop
         fin_1_msg = Package(self.__seq, self.__other_seq, False, False, True, is_fin_1=True)
+        self.__seq += 1
         self.__send_buffer.put(fin_1_msg)
 
         print('Closing connection...')
@@ -109,7 +121,7 @@ class SocketUDP:
             close_connection = False
             cur_try = 0
             while cur_try < Package.NUMBER_OF_RETRIES:
-                sock.sendto(package.encode(), to_addr)
+                SocketUDP.send_package(sock, package.encode(), to_addr)
                 try:
                     ack = acks_buffer.get(True, 1)
                     if ack.is_fin_2:
@@ -146,10 +158,10 @@ class SocketUDP:
                     # print('received ack for fin_2, break recv_loop server')
                     break
             elif package.is_syn:
-                sock.sendto(Package(0, package.seq + 1, True, False, False).encode(), to_addr)
+                SocketUDP.send_package(sock, Package(0, package.seq + 1, True, False, False).encode(), to_addr)
             elif package.is_fin_1:
                 # send ack
-                sock.sendto(Package(0, package.seq + 1, True, False, False).encode(), to_addr)
+                SocketUDP.send_package(sock, Package(0, package.seq + 1, True, False, False, is_fin_1=True).encode(), to_addr)
 
                 # send fin_2
                 # print('received fin_1, sending fin_2')
@@ -176,8 +188,8 @@ class SocketUDP:
                 break
             else:
                 recv_buffer.put(package)
-                sock.sendto(Package(0, package.seq + 1, True, False, False).encode(), to_addr)
+                SocketUDP.send_package(sock, Package(0, package.seq + 1, True, False, False).encode(), to_addr)
 
     @staticmethod
     def recv_fin_2_res(sock, _):
-        data, _ = sock.recvfrom(1024)
+        _, _ = sock.recvfrom(1024)
