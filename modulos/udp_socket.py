@@ -163,8 +163,7 @@ class SocketUDP:
                     sock.sendto(ack_msg.encode(), to_addr)
                     # print('received fin_2, sending ack')
 
-                    fin_2_msg = Value('i', 0)
-                    recv_thrd = Process(target=SocketUDP.recv_fin_2_res, args=(sock, fin_2_msg))
+                    recv_thrd = Process(target=SocketUDP.recv_fin_2_res, args=(sock, _))
                     recv_thrd.start()
                     recv_thrd.join(5)
                     if recv_thrd.is_alive():
@@ -180,7 +179,5 @@ class SocketUDP:
                 sock.sendto(Package(0, package.seq + 1, True, False, False).encode(), to_addr)
 
     @staticmethod
-    def recv_fin_2_res(sock, fin_2_msg):
+    def recv_fin_2_res(sock, _):
         data, _ = sock.recvfrom(1024)
-        if Package.decode(data).is_fin_2:
-            fin_2_msg.value = 1
