@@ -52,6 +52,7 @@ if __name__ == "__main__":
                 state = "break"
         
         elif state == "break":
+            print('got into break state')
             break
         
         elif state == "menu":
@@ -96,4 +97,4 @@ if __name__ == "__main__":
             # close_message = "close"
             # client.send_msg(close_message.encode())
 
-            status = "break"
+            state = "break"

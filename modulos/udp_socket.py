@@ -98,6 +98,8 @@ class SocketUDP:
     def send_loop(sock, send_buffer, acks_buffer, to_addr):
         while True:
             msg = send_buffer.get()
+            # if msg.content().decode() == "close": # if msg content is "close", get out of the loop, thread dies
+            #     break
             ok = False
             cur_try = 0
             while cur_try < Package.NUMBER_OF_RETRIES:
@@ -113,8 +115,6 @@ class SocketUDP:
             if not ok:
                 raise Exception(str(to_addr) + " is not responding :/")
 
-            # if msg.content().decode() == "close": # if msg content is "close", get out of the loop, thread dies
-            #     break
 
     @staticmethod
     def recv_loop(sock, acks_buffer, recv_buffer, send_buffer, to_addr):
@@ -125,9 +125,8 @@ class SocketUDP:
                 acks_buffer.put(package)
             elif package.is_syn:
                 sock.sendto(Package(0, package.seq + 1, True, False, False).encode(), to_addr)
+            # elif data.decode()[-5:] == "close":
+            #     break
             else:
                 recv_buffer.put(package)
                 sock.sendto(Package(0, package.seq + 1, True, False, False).encode(), to_addr)
-
-            # if data.decode()[-5:] == "close": # if msg received is "close", get out of the loop, thread dies
-            #     break

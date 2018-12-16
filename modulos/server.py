@@ -11,7 +11,7 @@ DNS_PORT = 49152
 self_HOST = ''
 self_PORT = 50000
 
-MENU = '\n\nMENU\nDigite:\n1. Listar arquivos\n2. Solicitar arquivos\n3. Encerrar conexão\n'
+MENU = '\n\nMENU\nEnter:\n1. List files\n2. Request file\n3. Close connection\n'
 
 def listFiles(files):
     list_of_files = ''
