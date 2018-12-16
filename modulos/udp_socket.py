@@ -156,12 +156,31 @@ class SocketUDP:
                 fin_2_msg = Package(0, package.seq + 1, False, False, True, is_fin_2=True)
                 send_buffer.put(fin_2_msg)
             elif package.is_fin_2:
-                # send ack
-                sock.sendto(Package(0, package.seq + 1, True, False, False, is_fin_2=True).encode(), to_addr)
+                # send ack and wait (if the ack is lost, it will receive fin_2 again and resend the ack)
+                ack_msg = Package(0, package.seq + 1, True, False, False, is_fin_2=True)
+                
+                while True:
+                    sock.sendto(ack_msg.encode(), to_addr)
+                    # print('received fin_2, sending ack')
+
+                    fin_2_msg = Value('i', 0)
+                    recv_thrd = Process(target=SocketUDP.recv_fin_2_res, args=(sock, fin_2_msg))
+                    recv_thrd.start()
+                    recv_thrd.join(5)
+                    if recv_thrd.is_alive():
+                        recv_thrd.terminate()
+                        recv_thrd.join()
+                        break
 
                 # break loop on client
-                # print('received fin_2, break recv_loop client')
+                # print('break recv_loop client')
                 break
             else:
                 recv_buffer.put(package)
                 sock.sendto(Package(0, package.seq + 1, True, False, False).encode(), to_addr)
+
+    @staticmethod
+    def recv_fin_2_res(sock, fin_2_msg):
+        data, _ = sock.recvfrom(1024)
+        if Package.decode(data).is_fin_2:
+            fin_2_msg.value = 1
