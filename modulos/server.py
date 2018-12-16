@@ -28,7 +28,9 @@ if __name__ == "__main__":
         message = "0" + domainString
         s.sendto(message.encode(), (DNS_HOST, DNS_PORT))
         data, addr = s.recvfrom(1024)
-        print('Received', data.decode())
+        print('Domain', data.decode()[1:], 'has been saved on DNS server')
+
+    print('Waiting for client to connect...')
 
     # accept client's connection
     server = SocketUDP(self_PORT)
@@ -59,6 +61,6 @@ if __name__ == "__main__":
             server.send_msg(file_data)
         
         elif client_choice == "3": # closeConnection
-            server.close()
+            print('Closing connection...')
             
             break
