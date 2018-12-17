@@ -23,7 +23,7 @@ class SocketUDP:
     def send_package(sock, package, to_addr):
         # pkg = Package.decode(package)
 
-        if random.randint(0,100) <= 50:     # 50% change of losing the package
+        if random.randint(0,100) >= 20:     # 20% change of losing the package
             sock.sendto(package, to_addr)
             # print('sent package', pkg.seq)
         # else:
