@@ -165,7 +165,7 @@ class SocketUDP:
 
                     recv_thrd = Process(target=SocketUDP.recv_fin_2_res, args=(sock, _))
                     recv_thrd.start()
-                    recv_thrd.join(5)
+                    recv_thrd.join(Package.NUMBER_OF_RETRIES)
                     if recv_thrd.is_alive():
                         recv_thrd.terminate()
                         recv_thrd.join()
